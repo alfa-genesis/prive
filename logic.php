@@ -1,4 +1,11 @@
 <?php
+error_reporting(E_ALL); // Error engine - always TRUE!
+ini_set('ignore_repeated_errors', TRUE); // always TRUE
+ini_set('display_errors', FALSE); // Error display - FALSE only in production environment or real server
+ini_set('log_errors', TRUE); // Error logging engine
+ini_set('error_log', 'errors.log'); // Logging file path
+ini_set('log_errors_max_len', 1024); // Logging file size
+ini_set('always_populate_raw_post_data','-1');
 function curl($url, $request = 'GET'){
     $ch = curl_init();
     $curlopt = array(
