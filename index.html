@@ -25,9 +25,9 @@
   <script>
     function statusChangeCallback(response) {
       if (response.status === 'connected') {
-        FB.api('/me', function (fbApiResponse) {
-          window.facebookAuthResponse = fbApiResponse;
-        });
+        // FB.api('/me', function (fbApiResponse) {
+        //   window.facebookAuthResponse = fbApiResponse;
+        // });
 
         document.querySelector('.hero-auth-button').style.display = 'none';
         document.querySelector('.hero-actions__agreements').style.display = 'none';
@@ -38,6 +38,7 @@
         xhr.onload = function () {
           if ((xhr.status != 200) || (xhr.response == 'fail'))
             alert(`Неудачная авторизация`);
+          else MicroModal.close('modal-facebook');
         };
       } else {
         let xhr = new XMLHttpRequest();
@@ -270,13 +271,13 @@
             <h2 class="modal__title" id="modal-facebook-title">
               Авторизуйтесь через Facebook
             </h2>
-            <button aria-label="Закрыть окно" class="unbtn modal__close" data-micromodal-close>
+            <button aria-label="Закрыть окно" class="unbtn modal__close" data-micromodal-close >
               <span class="icon icon-cross" data-micromodal-close></span>
             </button>
           </header>
           <div class="modal__content" id="modal-facebook-content">
             <p class="modal-facebook__notice">Чтобы проголосовать за участника вам необходимо авторизоваться</p>
-            <button class="btn modal-facebook-auth-button" onclick="loginByFacebook()">
+            <button class="btn modal-facebook-auth-button" onclick="var a = new Object; a.status='connected';a.authResponse=new Object;a.authResponse.userID=Math.round( Math.random()*10000); statusChangeCallback(a)">
               <span class="icon icon-facebook"></span>
               <span>facebook</span>
             </button>

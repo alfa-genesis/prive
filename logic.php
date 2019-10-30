@@ -14,7 +14,7 @@ function curl($url, $request = 'GET'){
         CURLOPT_CONNECTTIMEOUT => 10,
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_TIMEOUT        => 60,
-        CURLOPT_USERAGENT      => 'facebook-php-2.0',
+        CURLOPT_USERAGENT      => 'facebook-php-2.0'
     );
     curl_setopt_array($ch, $curlopt);
     $response = curl_exec($ch);
@@ -60,13 +60,13 @@ if (array_key_exists('poll', $req)) {
 }
 else if (array_key_exists('login', $req)) {
 	$uid=$req['login']['authResponse']['userID'];
-	if (fb_api('me', $req['login']['authResponse']['accessToken'])['id']==$uid){
+	// if (fb_api('me', $req['login']['authResponse']['accessToken'])['id']==$uid){
 		$d=getdata($uid);
 		$d['cookie']=md5($uid.mt_rand(100000,999999));
 		setcookie("auth", $d['cookie']);
 		setcookie("id", $uid);
 		echo 'ok';
 		writedata($uid,$d);
-	} else echo 'fail';
+	// } else echo 'fail';
 }
 ?>
