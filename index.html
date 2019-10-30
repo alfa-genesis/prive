@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="favicon/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="favicon/favicon.ico" type="image/x-icon" />
+
+    <!-- <meta property="og:title" content="">
+  <meta property="og:description" content="">
+  <meta property="og:image" content="images/og-image.png"> -->
+
+    <!-- First, all the preloads -->
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff"
+      href="fonts/HelveticaNeueCyr/HelveticaNeueCyr-Roman.woff"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff"
+      href="fonts/HelveticaNeueCyr/HelveticaNeueCyr-Medium.woff"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff"
+      href="fonts/PlayfairDisplay/PlayfairDisplay-Italic.woff"
+      crossorigin
+    />
+    <link rel="preload" as="font" type="font/woff" href="fonts/Cormorant/Cormorant-Regular.woff" crossorigin />
+    <link rel="preload" as="font" type="font/woff" href="fonts/Cormorant/Cormorant-Medium.woff" crossorigin />
+    <link rel="preload" as="font" type="font/woff" href="fonts/Cormorant/Cormorant-Bold.woff" crossorigin />
+    <link rel="stylesheet" href="css/style.bundle.css?v=1572262468197" />
+    <title>Prive7</title>
+    <script>
+      function statusChangeCallback(response) {
+        if (response.status === 'connected') {
+          FB.api('/me', function(fbApiResponse) {
+            window.facebookAuthResponse = fbApiResponse;
+          });
+
+          document.querySelector('.hero-auth-button').style.display = 'none';
+          document.querySelector('.hero-actions__agreements').style.display = 'none';
+          let xhr = new XMLHttpRequest();
+          xhr.open('POST', 'logic.php');
+          var dataJSON = JSON.stringify({"login":response});
+          xhr.send(dataJSON);
+          xhr.onload = function() {
+            if ((xhr.status != 200) || (xhr.response=='fail')) 
+              alert(`Неудачная авторизация`);
+          };
+        } else {
+          let xhr = new XMLHttpRequest();
+          xhr.open('POST', 'logic.php');
+          var dataJSON = JSON.stringify({"start":1});
+          xhr.send(dataJSON);
+          xhr.onload = function() {
+              document.querySelector('.hero-auth-button').style.display = xhr.response=='ok' ? 'none':'block';
+              document.querySelector('.hero-actions__agreements').style.display = document.querySelector('.hero-auth-button').style.display;
+          };
+        }
+      }
+
+      function checkLoginState() {
+        FB.getLoginStatus(function(response) {
+          statusChangeCallback(response);
+        });
+      }
+
+      window.fbAsyncInit = function() {
+        FB.init({
+          appId: '513634922809856',
+          cookie: true,
+          xfbml: true,
+          version: 'v4.0',
+        });
+
+        FB.getLoginStatus(function(response) {
+          statusChangeCallback(response);
+        });
+      };
+
+      (function(d, s, id) {
+        var js,
+          fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s);
+        js.id = id;
+        js.src = 'https://connect.facebook.net/en_US/sdk.js';
+        fjs.parentNode.insertBefore(js, fjs);
+      })(document, 'script', 'facebook-jssdk');
+
+      function loginByFacebook() {
+        FB.login(
+          function(response) {
+            checkLoginState();
+
+            if (MicroModal) {
+              MicroModal.close('modal-facebook');
+            }
+          },
+          { scope: 'public_profile,email' },
+        );
+      }
+    </script>
+  </head>
+
+  <body>
+    <header class="header">
+      <div class="header-wrapper">
+        <div class="header__inner page-container">
+          <div class="header__left">
+            <div class="header-place">
+      <!-- city=['','Москва Жуковка','Москва Европейский','Краснодар','Санкт-Петербург','Баку', "Москва Фрунзенская"]; -->
+              <select class="header-place__select" id="city" onchange="loadmemb(document.getElementById('city').value)" data-custom-select>
+                <option value="6">Москва Фрунзенская</option>
+                <option value="1">Москва Жуковка</option>
+                <option value="2">Москва Европейский</option>
+                <option value="3">Краснодар</option>
+                <option value="4">Санкт-Петербург</option>
+                <option value="5">Баку</option>
+              </select>
+            </div>
+          </div>
+          <div class="header__center">
+            <a href="/" class="header-logo">
+              <span class="icon icon-logo"></span>
+            </a>
+          </div>
+          <div class="header__right">
+            <a href="#" class="link header-instagram-link">
+              <span class="icon icon-instagram"></span>
+              <span>Instagram</span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="page-container hero">
+        <h1 class="hero-title">Конкурс специалистов сети салонов Prive7</h1>
+        <div class="hero-actions">
+          <div class="hero-actions__buttons">
+            <a href="#rating" class="hero-actions__buttons-button btn btn--transparent hero-poll-button">Голосовать</a>
+            <span id="status"></span>
+            <button class="hero-actions__buttons-button btn btn--primary hero-auth-button">Авторизоваться</button>
+          </div>
+          <div class="hero-actions__agreements">
+            <label class="check">
+              <input class="check__input" type="checkbox" name="agreements" />
+              <span class="check__box"></span>
+              <span>Я ознакомлен с <a class="link link--underline" href="#">правилами конкурса </a></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </header>
+    <main class="main">
+      <section class="section section-rating" id="rating">
+        <div class="page-container section-rating__container">
+          <h2 class="section-title">Рейтинг специалистов</h2>
+          <p class="section-subtitle">
+            Рейтинг всеросийского конкурса "PRIVE7&nbsp;Лучшие&nbsp;из&nbsp;лучших" определяется&nbsp;результатами
+            голосования желающих
+          </p>
+          <div class="rating-wrapper">
+            <ul class="rating-category-list" style="flex-wrap: wrap;">
+              <li class="rating-category-list__item category">
+                <button class="unbtn link category-link" data-filter-category="1">Стилист</button>
+              </li>
+              <li class="rating-category-list__item category">
+                <button class="unbtn link category-link" data-filter-category="2">Визажист</button>
+              </li>
+              <li class="rating-category-list__item category">
+                <button class="unbtn link category-link" data-filter-category="3">Косметолог</button>
+              </li>
+              <li class="rating-category-list__item category">
+                <button class="unbtn link category-link" data-filter-category="4">Мастер маникюра</button>
+              </li>
+              <li class="rating-category-list__item category">
+                <button class="unbtn link category-link" data-filter-category="5">Мастер по ресницам</button>
+              </li>
+              <li class="rating-category-list__item category">
+                <button class="unbtn link category-link" data-filter-category="6">Администратор</button>
+              </li>
+              <li class="rating-category-list__item category">
+                <button class="unbtn link category-link" data-filter-category="7">Бровист</button>
+              </li>
+              <li class="rating-category-list__item category">
+                <button class="unbtn link category-link" data-filter-category="8">Мастер перманентного макияжа</button>
+              </li>
+              <li class="rating-category-list__item category">
+                <button class="unbtn link category-link" data-filter-category="9">Мастер ногтевого сервиса</button>
+              </li>
+              <li class="rating-category-list__item category">
+                <button class="unbtn link category-link" data-filter-category="10">Официант</button>
+              </li>
+              <li class="rating-category-list__item category">
+                <button class="unbtn link category-link" data-filter-category="11">Массажист</button>
+              </li>
+              <li class="rating-category-list__item category">
+                <button class="unbtn link category-link" data-filter-category="12">Мастер маникюра-педикюра</button>
+              </li>
+            </ul>
+            <div class="rating-category-list--mobile">
+              <select class="rating-category-list__select" data-custom-select="filter-category">
+                <!-- 
+      pr=['','Стилист','Визажист','Косметолог','Мастер маникюра','Мастер по ресницам','Администратор', 'Бровист', "Мастер перманентного макияжа","Мастер ногтевого сервиса","Официант","Массажист", "Мастер маникюра-педикюра"]; -->
+                <option value="all">Все категории</option>
+                <option value="1">Стилист</option>
+                <option value="2">Визажист</option>
+                <option value="3">Косметолог</option>
+                <option value="4">Мастер маникюра</option>
+                <option value="5">Мастер по ресницам</option>
+                <option value="6">Администратор</option>
+                <option value="7">Бровист</option>
+                <option value="8">Мастер перманентного макияжа</option>
+                <option value="9">Мастер ногтевого сервиса</option>
+                <option value="10">Официант</option>
+                <option value="11">Массажист</option>
+                <option value="12">Мастер маникюра-педикюра</option>
+              </select>
+            </div>
+            <div class="rating-participator-wrapper">
+              <ul class="rating-participator-list" id="dest" data-category-list>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="footer">
+      <div class="page-container footer-container">
+        <div class="footer__left">
+          <span class="copyrights">© Prive7 2019 г.</span>
+          <nav class="footer-nav">
+            <ul class="footer-nav__list">
+              <li class="footer-nav__list-item">
+                <a href="#" class="link">Политика конфиденциальности</a>
+              </li>
+              <li class="footer-nav__list-item">
+                <a href="#" class="link">Правила конкурса</a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        <div class="footer__right">
+          <ul class="footer-socials-list">
+            <li class="footer-socials-list__item">
+              <a href="#" class="link">
+                <span class="icon icon-instagram"></span>
+              </a>
+            </li>
+            <li class="footer-socials-list__item">
+              <a href="#" class="link">
+                <span class="icon icon-facebook"></span>
+              </a>
+            </li>
+            <li class="footer-socials-list__item">
+              <a href="#" class="link">
+                <span class="icon icon-vk"></span>
+              </a>
+            </li>
+            <li class="footer-socials-list__item">
+              <a href="#" class="link">
+                <span class="icon icon-youtube"></span>
+              </a>
+            </li>
+          </ul>
+        </div>
+        <p class="copyrights copyrights--mobile">© Prive7 2019 г.</p>
+      </div>
+    </footer>
+    <!-- FACEBOOK MODAL AUTH -->
+    <div class="modal modal-facebook" id="modal-facebook" aria-hidden="true">
+      <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+        <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-facebook-title">
+          <div class="modal-facebook-wrapper">
+            <header class="modal__header">
+              <h2 class="modal__title" id="modal-facebook-title">
+                Авторизуйтесь через Facebook
+              </h2>
+              <button aria-label="Закрыть окно" class="unbtn modal__close" data-micromodal-close>
+                <span class="icon icon-cross" data-micromodal-close></span>
+              </button>
+            </header>
+            <div class="modal__content" id="modal-facebook-content">
+              <p class="modal-facebook__notice">Чтобы проголосовать за участника вам необходимо авторизоваться</p>
+              <button class="btn modal-facebook-auth-button" onclick="loginByFacebook()">
+                <span class="icon icon-facebook"></span>
+                <span>facebook</span>
+              </button>
+              <button class="btn btn--transparent-primary modal-facebook-no-button" data-micromodal-close>
+                Не сейчас
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- POLL MODAL SUCCESS -->
+    <div class="modal modal-poll-success" id="modal-poll-success" aria-hidden="true">
+      <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+        <div class="modal__container" role="dialog" aria-modal="true" aria-labelledby="modal-poll-success-title">
+          <div class="modal-poll-success-wrapper">
+            <header class="modal__header">
+              <h2 class="modal__title" id="modal-poll-success-title">
+                Спасибо!
+              </h2>
+              <button aria-label="Закрыть окно" class="unbtn modal__close" data-micromodal-close>
+                <span class="icon icon-cross" data-micromodal-close></span>
+              </button>
+            </header>
+            <div class="modal__content" id="modal-poll-success-content">
+              <p class="modal-poll-success__notice">
+                Ваш голос учтён в номинации “Лучший стилист” по городу Москва. Хотите проголосовать в наминации “Лучший
+                визажист”?
+              </p>
+              <button class="btn btn--primary modal-poll-success-yes-button">Голосовать</button>
+              <button class="btn btn--transparent-primary modal-poll-success-no-button" data-micromodal-close>
+                Не сейчас
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+      dest = document.getElementById('dest');
+      city=['','Москва Жуковка','Москва Европейский','Краснодар','Санкт-Петербург','Баку', "Москва Фрунзенская"];
+      pr=['','Стилист','Визажист','Косметолог','Мастер маникюра','Мастер по ресницам','Администратор', 'Бровист', "Мастер перманентного макияжа","Мастер ногтевого сервиса","Официант","Массажист", "Мастер маникюра", "Мастер маникюра-педикюра"];
+      butcat=document.querySelectorAll("[data-filter-category]");
+
+      function loadmemb(cityid=6) {
+        dest.innerHTML='';
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', 'logic.php');
+        var dataJSON = JSON.stringify({"city":cityid});
+        xhr.send(dataJSON);
+        xhr.onload = function() {
+            memb = JSON.parse(xhr.response);
+              for (var j = butcat.length - 1; j >= 0; j--) {
+                butcat[j].style.display="none";
+              }
+            for (var i = memb.length - 1; i >= 0; i--) {
+              for (var j = butcat.length - 1; j >= 0; j--) {
+                if (butcat[j].getAttribute("data-filter-category")==memb[i].project) butcat[j].style.display="inline-block";
+              }
+              
+              dest.insertAdjacentHTML('beforeend', `<li class="rating-participator-list__item participator" data-category="${memb[i].project}">
+                    <div class="participator__photo">
+                      <img src="images/participators/${memb[i].url}.jpg" alt="${pr[memb[i].project]} ${memb[i].name}" width="" height="" />
+                    </div>
+                    <p class="participator__place">${city[memb[i].location]}</p>
+                    <p class="participator__name">${memb[i].name}</p>
+                    <p class="participator__profession">${pr[memb[i].project]}</p>
+                    <button class="btn btn--transparent-primary participator-button" data-poll-id="${memb[i].id}">Голосовать</button>
+                  </li>`);
+            }
+            var pollButtons = document.querySelectorAll("[data-poll-id]");
+            if (pollButtons) {
+              Array.from(pollButtons).forEach(function (button) {
+                button.addEventListener('click', function (event) {
+                  id=document.cookie.match(new RegExp(
+                      "(?:^|; )" + 'id'.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+                    ));
+                  if (id) {
+                    id=id[1];
+                    var pollId = event.currentTarget.getAttribute("data-poll-id");
+                    let xhr = new XMLHttpRequest();
+                    xhr.open('POST', 'logic.php');
+                    var dataJSON = JSON.stringify({"poll":pollId});
+                    xhr.send(dataJSON);
+                    xhr.onload = function() {
+                      // alert(xhr.response);
+                       if (xhr.response=='ok') MicroModal.show('modal-poll-success');
+                       if (xhr.response=='unauth') MicroModal.show('modal-facebook');
+                    }
+                  } else {
+                    MicroModal.show('modal-facebook');
+                  }
+                });
+              });
+            }
+        };
+      }
+        loadmemb();
+    </script>
+    <script src="js/bundle.js?v=1572262468197"></script>
+  </body>
+</html>
