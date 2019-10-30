@@ -29,7 +29,7 @@ function fb_api($url, $access_token = false, $request = 'GET'){
         $url .= (strstr($url, '?') ? '&' : '?').'access_token='.$access_token;
     return json_decode(curl($url, $request), true);
 }
-include __DIR__.'\db.php';
+include __DIR__.'/db.php';
 $req = json_decode(file_get_contents( "php://input" ), true);
 if ((array_key_exists('start', $req)) && isset($_COOKIE["id"]) && isset($_COOKIE["auth"])) {
 	$uid=$_COOKIE["id"];
