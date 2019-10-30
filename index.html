@@ -316,10 +316,10 @@
             </header>
             <div class="modal__content" id="modal-poll-success-content">
               <p class="modal-poll-success__notice">
-                Ваш голос учтён в номинации “Лучший стилист” по городу Москва. Хотите проголосовать в наминации “Лучший
-                визажист”?
+                Ваш голос учтён в номинации “Лучший <span id="catcur">стилист</span>” по городу Москва. Хотите проголосовать в наминации “Лучший
+                <span id="catnext">визажист</span>”?
               </p>
-              <button class="btn btn--primary modal-poll-success-yes-button">Голосовать</button>
+              <button class="btn btn--primary modal-poll-success-yes-button" onclick="MicroModal.close('modal-poll-success'); catnext.click();">Голосовать</button>
               <button class="btn btn--transparent-primary modal-poll-success-no-button" data-micromodal-close>
                 Не сейчас
               </button>
@@ -333,7 +333,7 @@
       city=['','Москва Жуковка','Москва Европейский','Краснодар','Санкт-Петербург','Баку', "Москва Фрунзенская"];
       pr=['','Стилист','Визажист','Косметолог','Мастер маникюра','Мастер по ресницам','Администратор', 'Бровист', "Мастер перманентного макияжа","Мастер ногтевого сервиса","Официант","Массажист", "Мастер маникюра", "Мастер маникюра-педикюра"];
       butcat=document.querySelectorAll("[data-filter-category]");
-
+      var catnext;
       function loadmemb(cityid=6) {
         dest.innerHTML='';
         let xhr = new XMLHttpRequest();
@@ -357,7 +357,7 @@
                     <p class="participator__place">${city[memb[i].location]}</p>
                     <p class="participator__name">${memb[i].name}</p>
                     <p class="participator__profession">${pr[memb[i].project]}</p>
-                    <button class="btn btn--transparent-primary participator-button" data-poll-id="${memb[i].id}">Голосовать</button>
+                    <button class="btn btn--transparent-primary participator-button" data-cat="${memb[i].project}" data-poll-id="${memb[i].id}">Голосовать</button>
                   </li>`);
             }
             var pollButtons = document.querySelectorAll("[data-poll-id]");
@@ -370,12 +370,28 @@
                   if (id) {
                     id=id[1];
                     var pollId = event.currentTarget.getAttribute("data-poll-id");
+                    var catId = event.currentTarget.getAttribute("data-cat");
                     let xhr = new XMLHttpRequest();
                     xhr.open('POST', 'logic.php');
                     var dataJSON = JSON.stringify({"poll":pollId});
                     xhr.send(dataJSON);
                     xhr.onload = function() {
                       // alert(xhr.response);
+                       var cat = document.querySelectorAll("[data-filter-category]");
+                       var kostyl=true;
+                       
+                       for (var i = cat.length - 1; i >= 0; i--) {
+                        console.log("for "+cat[i].getAttribute("data-filter-category"));
+                         if (cat[i].getAttribute("data-filter-category")== catId )
+                          {
+                            document.getElementById('catcur').innerHTML=pr[cat[i].getAttribute("data-filter-category")].toLowerCase();
+                            kostyl=false;
+                          }
+                          else if (kostyl && cat[i].style.display=="inline-block"){
+                            document.getElementById('catnext').innerHTML=pr[cat[i].getAttribute("data-filter-category")].toLowerCase();
+                            catnext=cat[i];
+                          }
+                       }
                        if (xhr.response=='ok') MicroModal.show('modal-poll-success');
                        if (xhr.response=='unauth') MicroModal.show('modal-facebook');
                     }
