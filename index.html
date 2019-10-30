@@ -287,6 +287,7 @@
       </div>
     </div>
   </div>
+
   <!-- POLL MODAL SUCCESS -->
   <div class="modal modal-poll-success" id="modal-poll-success" aria-hidden="true">
     <div class="modal__overlay" tabindex="-1" data-micromodal-close>
@@ -302,10 +303,12 @@
           </header>
           <div class="modal__content" id="modal-poll-success-content">
             <p class="modal-poll-success__notice">
-              Ваш голос учтён в номинации “Лучший стилист” по городу Москва. Хотите проголосовать в наминации “Лучший
-              визажист”?
+              Ваш голос учтён в номинации “Лучший <span id="catcur">стилист</span>” по городу Москва. Хотите
+              проголосовать в наминации “Лучший
+              <span id="catnext">визажист</span>”?
             </p>
-            <button class="btn btn--primary modal-poll-success-yes-button">Голосовать</button>
+            <button class="btn btn--primary modal-poll-success-yes-button"
+              onclick="MicroModal.close('modal-poll-success'); catnext.click();">Голосовать</button>
             <button class="btn btn--transparent-primary modal-poll-success-no-button" data-micromodal-close>
               Не сейчас
             </button>
@@ -547,84 +550,99 @@
         </div>
       </div>
     </div>
-  </div>
-  <script type="text/javascript">
-    dest = document.getElementById('dest');
-    city = ['', 'Москва Жуковка', 'Москва Европейский', 'Краснодар', 'Санкт-Петербург', 'Баку', "Москва Фрунзенская"];
-    pr = ['', 'Стилист', 'Визажист', 'Косметолог', 'Мастер маникюра', 'Мастер по ресницам', 'Администратор', 'Бровист', "Мастер перманентного макияжа", "Мастер ногтевого сервиса", "Официант", "Массажист", "Мастер маникюра", "Мастер маникюра-педикюра"];
-    butcat = document.querySelectorAll("[data-filter-category]");
-
-    function loadmemb(cityid = 6) {
-      dest.innerHTML = '';
-      let xhr = new XMLHttpRequest();
-      xhr.open('POST', 'logic.php');
-      var dataJSON = JSON.stringify({ "city": cityid });
-      xhr.send(dataJSON);
-      xhr.onload = function () {
-        memb = JSON.parse(xhr.response);
-        for (var j = butcat.length - 1; j >= 0; j--) {
-          butcat[j].style.display = "none";
-        }
-        for (var i = memb.length - 1; i >= 0; i--) {
+    <script type="text/javascript">
+      dest = document.getElementById('dest');
+      city = ['', 'Москва Жуковка', 'Москва Европейский', 'Краснодар', 'Санкт-Петербург', 'Баку', "Москва Фрунзенская"];
+      pr = ['', 'Стилист', 'Визажист', 'Косметолог', 'Мастер маникюра', 'Мастер по ресницам', 'Администратор', 'Бровист', "Мастер перманентного макияжа", "Мастер ногтевого сервиса", "Официант", "Массажист", "Мастер маникюра", "Мастер маникюра-педикюра"];
+      butcat = document.querySelectorAll("[data-filter-category]");
+      var catnext;
+      function loadmemb(cityid = 6) {
+        dest.innerHTML = '';
+        let xhr = new XMLHttpRequest();
+        xhr.open('POST', 'logic.php');
+        var dataJSON = JSON.stringify({ "city": cityid });
+        xhr.send(dataJSON);
+        xhr.onload = function () {
+          memb = JSON.parse(xhr.response);
           for (var j = butcat.length - 1; j >= 0; j--) {
-            if (butcat[j].getAttribute("data-filter-category") == memb[i].project) butcat[j].style.display = "inline-block";
+            butcat[j].style.display = "none";
           }
+          for (var i = memb.length - 1; i >= 0; i--) {
+            for (var j = butcat.length - 1; j >= 0; j--) {
+              if (butcat[j].getAttribute("data-filter-category") == memb[i].project) butcat[j].style.display = "inline-block";
+            }
 
-          dest.insertAdjacentHTML('beforeend', `<li class="rating-participator-list__item participator" data-category="${memb[i].project}">
+            dest.insertAdjacentHTML('beforeend', `<li class="rating-participator-list__item participator" data-category="${memb[i].project}">
                     <div class="participator__photo">
                       <img src="images/participators/${memb[i].url}.jpg" alt="${pr[memb[i].project]} ${memb[i].name}" width="" height="" />
                     </div>
                     <p class="participator__place">${city[memb[i].location]}</p>
                     <p class="participator__name">${memb[i].name}</p>
                     <p class="participator__profession">${pr[memb[i].project]}</p>
-                    <button class="btn btn--transparent-primary participator-button" data-poll-id="${memb[i].id}">Голосовать</button>
+                    <button class="btn btn--transparent-primary participator-button" data-cat="${memb[i].project}" data-poll-id="${memb[i].id}">Голосовать</button>
                   </li>`);
-        }
-        var pollButtons = document.querySelectorAll("[data-poll-id]");
-        if (pollButtons) {
-          Array.from(pollButtons).forEach(function (button) {
-            button.addEventListener('click', function (event) {
-              id = document.cookie.match(new RegExp(
-                "(?:^|; )" + 'id'.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-              ));
-              if (id) {
-                id = id[1];
-                var pollId = event.currentTarget.getAttribute("data-poll-id");
-                let xhr = new XMLHttpRequest();
-                xhr.open('POST', 'logic.php');
-                var dataJSON = JSON.stringify({ "poll": pollId });
-                xhr.send(dataJSON);
-                xhr.onload = function () {
-                  // alert(xhr.response);
-                  if (xhr.response == 'ok') MicroModal.show('modal-poll-success');
-                  if (xhr.response == 'unauth') MicroModal.show('modal-facebook');
+          }
+
+          var pollButtons = document.querySelectorAll("[data-poll-id]");
+          if (pollButtons) {
+            Array.from(pollButtons).forEach(function (button) {
+              button.addEventListener('click', function (event) {
+                id = document.cookie.match(new RegExp(
+                  "(?:^|; )" + 'id'.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+                ));
+                if (id) {
+                  id = id[1];
+                  var pollId = event.currentTarget.getAttribute("data-poll-id");
+                  var catId = event.currentTarget.getAttribute("data-cat");
+                  let xhr = new XMLHttpRequest();
+                  xhr.open('POST', 'logic.php');
+                  var dataJSON = JSON.stringify({ "poll": pollId });
+                  xhr.send(dataJSON);
+                  xhr.onload = function () {
+                    // alert(xhr.response);
+                    var cat = document.querySelectorAll("[data-filter-category]");
+                    var kostyl = true;
+
+                    for (var i = cat.length - 1; i >= 0; i--) {
+                      console.log("for " + cat[i].getAttribute("data-filter-category"));
+                      if (cat[i].getAttribute("data-filter-category") == catId) {
+                        document.getElementById('catcur').innerHTML = pr[cat[i].getAttribute("data-filter-category")].toLowerCase();
+                        kostyl = false;
+                      }
+                      else if (kostyl && cat[i].style.display == "inline-block") {
+                        document.getElementById('catnext').innerHTML = pr[cat[i].getAttribute("data-filter-category")].toLowerCase();
+                        catnext = cat[i];
+                      }
+                    }
+                    if (xhr.response == 'ok') MicroModal.show('modal-poll-success');
+                    if (xhr.response == 'unauth') MicroModal.show('modal-facebook');
+                  }
+                } else {
+                  MicroModal.show('modal-facebook');
                 }
-              } else {
-                MicroModal.show('modal-facebook');
-              }
+              });
             });
-          });
-        }
-      };
-    }
-    loadmemb();
-
-
-    document.addEventListener('DOMContentLoaded', function () {
-      if (document.readyState === 'interactive' || document.readyState === 'complete') {
-        var privacyBtn = document.querySelector('.btn-privacy');
-
-        if (privacyBtn) {
-          privacyBtn.addEventListener('click', function (event) {
-            if (MicroModal) {
-              MicroModal.show('modal-privacy');
-            }
-          })
-        }
+          }
+        };
       }
-    });
-  </script>
-  <script src="js/bundle.min.js?v=1572262468197"></script>
+      loadmemb();
+
+
+      document.addEventListener('DOMContentLoaded', function () {
+        if (document.readyState === 'interactive' || document.readyState === 'complete') {
+          var privacyBtn = document.querySelector('.btn-privacy');
+
+          if (privacyBtn) {
+            privacyBtn.addEventListener('click', function (event) {
+              if (MicroModal) {
+                MicroModal.show('modal-privacy');
+              }
+            })
+          }
+        }
+      });
+    </script>
+    <script src="js/bundle.min.js?v=1572262468197"></script>
 </body>
 
 </html>
