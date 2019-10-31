@@ -1516,10 +1516,6 @@ h6 {
   .custom-select-opener {
     width: 100%;
     min-width: auto;
-    padding: 0;
-  }
-  .custom-select-opener:after {
-    content: none;
   }
 }
 .custom-select-opener:focus {
