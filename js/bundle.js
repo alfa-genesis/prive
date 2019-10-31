@@ -3010,22 +3010,24 @@ function home_init() {
     });
   }
 
-  micromodal_es.init({
+  var modalOptions = {
     disableScroll: true,
     awaitCloseAnimation: true,
-    onShow: function onShow() {
-      document.body.style.paddingRight = scrollbarSize_default()() + "px";
-    },
-    onClose: function onClose() {
-      document.body.removeAttribute('style');
-    },
-    debugMode: true
-  });
+  };
+
+  micromodal_es.init(modalOptions);
+  window.MicroModal = {};
+  window.MicroModal.close = micromodal_es.close;
+  window.MicroModal.show = function(name, options) {
+    var opts = Object.assign({}, modalOptions, options);
+    micromodal_es.show(name, opts);
+  };
+
   document.querySelector('.hero-auth-button').addEventListener('click', function () {
-    if (document.getElementsByName("agreements")[0].checked) 
-      micromodal_es.show('modal-facebook');
+    if (document.getElementsByName("agreements")[0].checked)
+      window.MicroModal.show('modal-facebook');
   });
-  window.MicroModal = micromodal_es;
+
   var header = document.querySelector('.header-wrapper');
   var headerOffsetTop = header.offsetTop;
   window.addEventListener('scroll', function () {
