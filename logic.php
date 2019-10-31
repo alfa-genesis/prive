@@ -38,7 +38,12 @@ if ((array_key_exists('start', $req)) && isset($_COOKIE["id"]) && isset($_COOKIE
 	echo ($d['cookie']==$auth) ? 'ok' : 'fail';
 }
 if (array_key_exists('city', $req)) {
-	$d=getmem($req['city']);
+	$d=[];
+	$d['m']=getmem($req['city']);
+	$uid=$_COOKIE["id"];
+	if ($uid) $v=getdata($uid);
+	if ($v) $v['cookie']='';
+	if ($v) $d['v']=getdata($uid);
 	echo json_encode($d);
 }
 if (array_key_exists('poll', $req)) {

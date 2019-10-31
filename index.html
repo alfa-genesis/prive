@@ -306,10 +306,10 @@
           <div class="modal__content" id="modal-poll-success-content">
             <p class="modal-poll-success__notice">
               Ваш голос учтён в номинации “Лучший <span id="catcur">стилист</span>” по городу Москва. Хотите
-              проголосовать в наминации “Лучший
-              <span id="catnext">визажист</span>”?
+              проголосовать в <span id="nextcity">номинации “Лучший
+              <span id="catnext">визажист</span>”</span>?
             </p>
-            <button class="btn btn--primary modal-poll-success-yes-button"
+            <button class="btn btn--primary modal-poll-success-yes-button" id="btn_poll_suc" 
               onclick="MicroModal.close('modal-poll-success'); catnext.click();">Голосовать</button>
             <button class="btn btn--transparent-primary modal-poll-success-no-button" data-micromodal-close>
               Не сейчас
@@ -565,7 +565,9 @@
         var dataJSON = JSON.stringify({ "city": cityid });
         xhr.send(dataJSON);
         xhr.onload = function () {
-          memb = JSON.parse(xhr.response);
+          r = JSON.parse(xhr.response);
+          memb=r['m'];
+          v=r['v'];
           for (var j = butcat.length - 1; j >= 0; j--) {
             butcat[j].style.display = "none";
           }
@@ -573,15 +575,20 @@
             for (var j = butcat.length - 1; j >= 0; j--) {
               if (butcat[j].getAttribute("data-filter-category") == memb[i].project) butcat[j].style.display = "inline-block";
             }
+            act=`<button class="btn btn--transparent-primary participator-button" data-cat="${memb[i].project}" data-citycat="${memb[i].location}${memb[i].project}" data-poll-id="${memb[i].id}">Голосовать</button>`;
+            if (v) if (v[memb[i].location+memb[i].project]) act='<span class="pri">Privе́7<span>';
+            if (v) if (v[memb[i].location+memb[i].project]==memb[i].id) act='<button class="btn btnvoted btn--transparent-primary participator-button" data-cat="${memb[i].project}" data-poll-id="${memb[i].id}">Спасибо за голос</button>';
+            
 
-            dest.insertAdjacentHTML('beforeend', `<li class="rating-participator-list__item participator" data-category="${memb[i].project}">
+            dest.insertAdjacentHTML('beforeend', `<li class="rating-participator-list__item participator" data-id="${memb[i].id}"
+              data-citycat="${memb[i].location}${memb[i].project}" data-category="${memb[i].project}">
                     <div class="participator__photo">
                       <img src="images/participators/${memb[i].url}.jpg" alt="${pr[memb[i].project]} ${memb[i].name}" width="" height="" />
                     </div>
                     <p class="participator__place">${city[memb[i].location]}</p>
                     <p class="participator__name">${memb[i].name}</p>
                     <p class="participator__profession">${pr[memb[i].project]}</p>
-                    <button class="btn btn--transparent-primary participator-button" data-cat="${memb[i].project}" data-poll-id="${memb[i].id}">Голосовать</button>
+                    <span class="act">${act}<span>
                   </li>`);
           }
 
@@ -596,6 +603,8 @@
                   id = id[1];
                   var pollId = event.currentTarget.getAttribute("data-poll-id");
                   var catId = event.currentTarget.getAttribute("data-cat");
+                  var citycat = event.currentTarget.getAttribute("data-citycat");
+                  var curmem = event.currentTarget;
                   let xhr = new XMLHttpRequest();
                   xhr.open('POST', 'logic.php');
                   var dataJSON = JSON.stringify({ "poll": pollId });
@@ -604,19 +613,40 @@
                     // alert(xhr.response);
                     var cat = document.querySelectorAll("[data-filter-category]");
                     var kostyl = true;
-
+                    var next = true;
                     for (var i = cat.length - 1; i >= 0; i--) {
-                      console.log("for " + cat[i].getAttribute("data-filter-category"));
                       if (cat[i].getAttribute("data-filter-category") == catId) {
                         document.getElementById('catcur').innerHTML = pr[cat[i].getAttribute("data-filter-category")].toLowerCase();
                         kostyl = false;
                       }
                       else if (kostyl && cat[i].style.display == "inline-block") {
+                        document.getElementById('nextcity').innerHTML='номинации “Лучший <span id="catnext">визажист</span>”';
                         document.getElementById('catnext').innerHTML = pr[cat[i].getAttribute("data-filter-category")].toLowerCase();
+                        document.getElementById('btn_poll_suc').onclick=function(){MicroModal.close('modal-poll-success'); catnext.click();};
                         catnext = cat[i];
+                        next = false;
                       }
                     }
-                    if (xhr.response == 'ok') MicroModal.show('modal-poll-success');
+                    if(next)  {
+                      curcity=document.getElementById('city').value;
+                      ++curcity;
+                      if (curcity==7) {curcity=1}
+                      document.getElementById('nextcity').innerHTML=city[curcity];
+                      document.getElementById('btn_poll_suc').onclick=function(){
+                        MicroModal.close('modal-poll-success');
+                        document.getElementById('city').value=curcity;
+                        document.getElementById('city').parentElement.children[0].children[0].innerHTML=city[curcity];
+                        loadmemb(curcity);
+                      };
+                    }
+                    if (xhr.response == 'ok') {
+                      MicroModal.show('modal-poll-success');
+                      var members = document.querySelectorAll(".participator");
+                      for (var i = members.length - 1; i >= 0; i--) {
+                        if(members[i].getAttribute("data-citycat")==citycat) members[i].children[4].innerHTML='<span class="pri">Privе́7<span>';
+                        if(members[i].getAttribute("data-id")==pollId) members[i].children[4].innerHTML='<button class="btn btnvoted btn--transparent-primary participator-button" data-cat="${memb[i].project}" data-poll-id="${memb[i].id}">Спасибо за голос</button>';
+                      }
+                    }
                     if (xhr.response == 'unauth') MicroModal.show('modal-facebook');
                   }
                 } else {

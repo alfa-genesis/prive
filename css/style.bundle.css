@@ -2168,3 +2168,20 @@ h6 {
   padding: 0 0 0 40px;
   list-style-type: initial;
 }
+.pri{
+  color:#D1D8EA;
+  font-family: Cormorant, sans-serif;
+  font-size: 1.7rem;
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  padding-top: 1.1rem;
+  cursor: default;
+}
+.btnvoted{
+  border: 0.0625rem solid #f92d67;
+  background: #f92d67;
+  color: #fff;
+  box-shadow: none;
+  cursor: default;
+}
