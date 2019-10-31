@@ -65,13 +65,13 @@ if (array_key_exists('poll', $req)) {
 }
 else if (array_key_exists('login', $req)) {
 	$uid=$req['login']['authResponse']['userID'];
-	// if (fb_api('me', $req['login']['authResponse']['accessToken'])['id']==$uid){
+	if (fb_api('me', $req['login']['authResponse']['accessToken'])['id']==$uid){
 		$d=getdata($uid);
 		$d['cookie']=md5($uid.mt_rand(100000,999999));
 		setcookie("auth", $d['cookie']);
 		setcookie("id", $uid);
 		echo 'ok';
 		writedata($uid,$d);
-	// } else echo 'fail';
+	} else echo 'fail';
 }
 ?>

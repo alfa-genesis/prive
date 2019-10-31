@@ -25,9 +25,9 @@
   <script>
     function statusChangeCallback(response) {
       if (response.status === 'connected') {
-        // FB.api('/me', function (fbApiResponse) {
-        //   window.facebookAuthResponse = fbApiResponse;
-        // });
+        FB.api('/me', function (fbApiResponse) {
+          window.facebookAuthResponse = fbApiResponse;
+        });
 
         document.querySelector('.hero-auth-button').style.display = 'none';
         document.querySelector('.hero-actions__agreements').style.display = 'none';
@@ -104,7 +104,7 @@
         <div class="header__left">
           <div class="header-place">
             <!-- city=['','Москва Жуковка','Москва Европейский','Краснодар','Санкт-Петербург','Баку', "Москва Фрунзенская"]; -->
-            <select class="header-place__select" id="city" onchange="loadmemb(document.getElementById('city').value)"
+            <select class="header-place__select" id="city" onchange="loadmemb(document.getElementById('city').value); location.href='http://localhost/prive/#rating';"
               data-custom-select>
               <option value="6">Москва Фрунзенская</option>
               <option value="1">Москва Жуковка</option>
@@ -194,7 +194,7 @@
             </li>
           </ul>
           <div class="rating-category-list--mobile">
-            <select class="rating-category-list__select" data-custom-select="filter-category">
+            <select class="rating-category-list__select" id="mob_cat" data-custom-select="filter-category" onchange="document.querySelectorAll(`[data-filter-category='`+document.getElementById(`mob_cat`).value+`']`)[0].click();">
               <!--
       pr=['','Стилист','Визажист','Косметолог','Мастер маникюра','Мастер по ресницам','Администратор', 'Бровист', "Мастер перманентного макияжа","Мастер ногтевого сервиса","Официант","Массажист", "Мастер маникюра-педикюра"]; -->
               <option value="all">Все категории</option>
@@ -277,7 +277,7 @@
           </header>
           <div class="modal__content" id="modal-facebook-content">
             <p class="modal-facebook__notice">Чтобы проголосовать за участника вам необходимо авторизоваться</p>
-            <button class="btn modal-facebook-auth-button" onclick="var a = new Object; a.status='connected';a.authResponse=new Object;a.authResponse.userID=Math.round( Math.random()*10000); statusChangeCallback(a)">
+            <button class="btn modal-facebook-auth-button" onclick="loginByFacebook()">
               <span class="icon icon-facebook"></span>
               <span>facebook</span>
             </button>
@@ -552,13 +552,16 @@
         </div>
       </div>
     </div>
+    <script src="js/bundle.js"></script>
     <script type="text/javascript">
       dest = document.getElementById('dest');
       city = ['', 'Москва Жуковка', 'Москва Европейский', 'Краснодар', 'Санкт-Петербург', 'Баку', "Москва Фрунзенская"];
       pr = ['', 'Стилист', 'Визажист', 'Косметолог', 'Мастер маникюра', 'Мастер по ресницам', 'Администратор', 'Бровист', "Мастер перманентного макияжа", "Мастер ногтевого сервиса", "Официант", "Массажист", "Мастер маникюра", "Мастер маникюра-педикюра"];
       butcat = document.querySelectorAll("[data-filter-category]");
+      butcatmob = document.querySelectorAll("#mob_cat option");
       var catnext;
       function loadmemb(cityid = 6) {
+      butcatmobview = document.getElementById('mob_cat').parentElement.children.item(2).children;
         dest.innerHTML = '';
         let xhr = new XMLHttpRequest();
         xhr.open('POST', 'logic.php');
@@ -570,10 +573,14 @@
           v=r['v'];
           for (var j = butcat.length - 1; j >= 0; j--) {
             butcat[j].style.display = "none";
+            butcatmobview[j+1].style.display = "none";
+            butcatmob[j+1].disabled = true;
           }
           for (var i = memb.length - 1; i >= 0; i--) {
             for (var j = butcat.length - 1; j >= 0; j--) {
               if (butcat[j].getAttribute("data-filter-category") == memb[i].project) butcat[j].style.display = "inline-block";
+              if (butcatmobview[j+1].getAttribute("data-value") == memb[i].project) butcatmobview[j+1].style.display = "block";
+              if (butcatmob[j+1].value == memb[i].project) butcatmob[j+1].disabled = false;
             }
             act=`<button class="btn btn--transparent-primary participator-button" data-cat="${memb[i].project}" data-citycat="${memb[i].location}${memb[i].project}" data-poll-id="${memb[i].id}">Голосовать</button>`;
             if (v) if (v[memb[i].location+memb[i].project]) act='<span class="pri">Privе́7<span>';
@@ -657,7 +664,7 @@
           }
         };
       }
-      loadmemb();
+      // loadmemb();
 
 
       document.addEventListener('DOMContentLoaded', function () {
@@ -671,10 +678,10 @@
               }
             })
           }
+           loadmemb();
         }
       });
     </script>
-    <script src="js/bundle.js"></script>
 </body>
 
 </html>
