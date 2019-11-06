@@ -341,7 +341,7 @@
         var dataJSON = JSON.stringify({"city":cityid});
         xhr.send(dataJSON);
         xhr.onload = function() {
-            memb = JSON.parse(xhr.response);
+            memb = JSON.parse(xhr.response)['m'];
               for (var j = butcat.length - 1; j >= 0; j--) {
                 butcat[j].style.display="none";
               }

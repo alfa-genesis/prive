@@ -1769,6 +1769,9 @@ h6 {
   letter-spacing: 0.03em;
   text-transform: uppercase;
   text-decoration: none;
+  text-align: center;
+  width: max-content;
+  margin: 0 auto;
 }
 .rating-category-list--mobile .custom-select-opener:after {
   content: '';
@@ -1799,10 +1802,13 @@ h6 {
   font-weight: 500;
   letter-spacing: 0.03em;
   text-transform: uppercase;
+  text-align: center;
+  width: 250px;
 }
 .rating-category-list--mobile .custom-select-option:first-child {
   border-top-left-radius: 0.3125rem;
   border-top-right-radius: 0.3125rem;
+  display: none;
 }
 .rating-category-list--mobile .custom-select-option:last-child {
   border-bottom-left-radius: 0.3125rem;
@@ -1822,7 +1828,7 @@ h6 {
   transform: translateY(-50%) rotate(-180deg);
 }
 .rating-category-list--mobile .custom-select-container .custom-select-panel {
-  position: absolute;
+  position: relative;
   left: 50%;
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
@@ -1837,6 +1843,7 @@ h6 {
   border: none;
   box-shadow: 0 0.625rem 2.5rem rgba(5, 12, 28, 0.15);
   border-radius: 0.3125rem;
+  display: inline-table;
 }
 .category-link {
   display: inline-block;
@@ -1890,7 +1897,6 @@ h6 {
   padding-top: 3.4375rem;
   width: calc(100% + 1.875rem);
   position: relative;
-  left: -0.9375rem;
 }
 @media screen and (max-width: 767px) {
   .rating-participator-list {
@@ -2137,32 +2143,37 @@ h6 {
 .participator {
   display: -webkit-box;
   display: -ms-flexbox;
-  display: flex;
+  display: grid;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
 }
-#modal-privacy .modal__container {
+#modal-privacy .modal__container, #modal-rules .modal__container {
   height: 90%;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-#modal-privacy .modal__container::-webkit-scrollbar {
+#modal-privacy .modal__container::-webkit-scrollbar,
+#modal-rules .modal__container::-webkit-scrollbar {
   width: 0;
   background: transparent;
 }
-#modal-privacy-title {
+#modal-privacy-title,
+#modal-rules-title {
   padding-top: 50px;
   padding-bottom: 20px;
 }
-#modal-privacy-content {
+#modal-privacy-content,
+#modal-rules-content {
   padding: 20px 30px;
 }
-#modal-privacy-content > p {
+#modal-privacy-content > p,
+#modal-rules-content > p {
   margin: 8px 0;
 }
-#modal-privacy-content > ul {
+#modal-privacy-content > ul,
+#modal-rules-content > ul {
   padding: 0 0 0 40px;
   list-style-type: initial;
 }
@@ -2173,8 +2184,8 @@ h6 {
   display: inline-block;
   width: 100%;
   text-align: center;
-  padding-top: 1.1rem;
   cursor: default;
+  padding-bottom: 1.8rem;
 }
 .btnvoted{
   border: 0.0625rem solid #f92d67;
