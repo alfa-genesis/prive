@@ -1093,6 +1093,7 @@ h6 {
 .check {
   padding-left: 2.0625rem;
   display: inline-block;
+  position: relative;
 }
 .check__input {
   position: absolute;
